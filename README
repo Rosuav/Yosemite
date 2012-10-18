@@ -1,0 +1,16 @@
+The Yosemite project grew out of a plan to maintain and manage a collection of
+Looney Tunes videos, and is now a more generic manager for videos.
+
+Currently written for Python 2.
+
+Requires a config file, config.py; see two examples in the repository.
+
+Tested on Windows XP, and Debian and Ubuntu Linux; the basic script will run
+on pretty much any platform, but communication with a video player may require
+some tweaking.
+
+Licensed under the BSD Open Source license.
+
+Copyright (c) 2011, Chris Angelico
+All rights reserved.
+
