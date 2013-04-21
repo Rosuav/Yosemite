@@ -9,13 +9,13 @@
 # Directories that look like DVDs (those that have a VIDEO_TS subfolder) will be treated as invokable.
 
 import os
-import urllib
-import BaseHTTPServer
+import urllib.request, urllib.parse, urllib.error
+import http.server
 import xml.sax.saxutils
 from config import * # Get the user config (see config.py)
 
 if usevnc: # Send keys via VNC. Works on any platform, as long as there's a VNC server running.
-	print "Connecting to VNC"
+	print("Connecting to VNC")
 	import socket
 	vnc=socket.socket()
 	vnc.connect(("127.0.0.1",5900))
@@ -29,7 +29,7 @@ if usevnc: # Send keys via VNC. Works on any platform, as long as there's a VNC 
 			vnc.send("\4\0\0\0\0\0"+key2) # Key up
 		vnc.send("\4\0\0\0\0\0"+key1) # Modifier up
 	shift="\xff\xe1"; ctrl="\xff\xe3"; left="\xff\x51"; right="\xff\x53"; space="\x00\x20"
-	print "VNC connection established."
+	print("VNC connection established.")
 	keysender="VNC"
 else: # Try some platform-specific methods.
 	try:
@@ -53,7 +53,7 @@ else: # Try some platform-specific methods.
 		else:
 			def dokey(key1,key2=None):
 				pass # No key sending available
-			print "Unable to send keys."
+			print("Unable to send keys.")
 			keysender="no key sender"
 
 if invokecmd!=None:
@@ -73,12 +73,12 @@ else:
 				if keysender=="crikey": os.system("crikey -s 1 '\27f'");
 			invoker="gnome-open"
 		else:
-			print "Unable to invoke movies."
+			print("Unable to invoke movies.")
 			invoker="no invoker"
 
-print "Using",invoker,"and",keysender
+print("Using",invoker,"and",keysender)
 
-class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
+class VideosHTTP(http.server.BaseHTTPRequestHandler):
 	def noresp(self):
 			self.send_response(200)
 			self.send_header("Content-type","text/plain")
@@ -114,7 +114,7 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 			self.noresp()
 			return
 		# Base path is actually used only once.
-		realpath=os.path.join(basepath,urllib.unquote(self.path[1:]).replace("/",os.sep))
+		realpath=os.path.join(basepath,urllib.parse.unquote(self.path[1:]).replace("/",os.sep))
 		try:
 			os.stat(realpath)
 			if not realpath.endswith(os.sep) and os.path.isdir(realpath):
@@ -166,7 +166,7 @@ function docmd(c)
 </div>
 <ul>
 """)
-			(path,dirs,files)=os.walk(realpath).next()
+			(path,dirs,files)=next(os.walk(realpath))
 			dirs.sort(key=str.lower);
 			if self.path!='/': dirs.insert(0,"..")
 			for d in dirs:
@@ -201,9 +201,9 @@ function docmd(c)
 	server_version="Videos/0.1"
 
 try:
-	server=BaseHTTPServer.HTTPServer(("",port),VideosHTTP)
-	print "Server active";
+	server=http.server.HTTPServer(("",port),VideosHTTP)
+	print("Server active");
 	server.serve_forever();
 except KeyboardInterrupt:
 	server.socket.close()
-print "Server terminated."
+print("Server terminated.")
