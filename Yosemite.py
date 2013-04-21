@@ -201,7 +201,7 @@ function docmd(c)
 	server_version="Videos/0.1"
 
 try:
-	server=BaseHTTPServer.HTTPServer(("",3003),VideosHTTP)
+	server=BaseHTTPServer.HTTPServer(("",port),VideosHTTP)
 	print "Server active";
 	server.serve_forever();
 except KeyboardInterrupt:
