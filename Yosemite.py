@@ -9,10 +9,21 @@
 # Directories that look like DVDs (those that have a VIDEO_TS subfolder) will be treated as invokable.
 
 import os
-import urllib.request, urllib.parse, urllib.error
-import http.server
+try:
+	from urllib.parse import unquote # Python 3
+except ImportError:
+	from urllib import unquote # Python 2
+try:
+	import http.server as BaseHTTPServer # Python 3
+except ImportError:
+	import BaseHTTPServer # Python 2
 import xml.sax.saxutils
 from config import * # Get the user config (see config.py)
+
+try:
+	FileNotFoundError
+except NameError:
+	FileNotFoundError=OSError
 
 if usevnc: # Send keys via VNC. Works on any platform, as long as there's a VNC server running.
 	print("Connecting to VNC")
@@ -43,7 +54,7 @@ else: # Try some platform-specific methods.
 			win32api.keybd_event(key1,0,2,0)
 		shift=16; ctrl=17; left=37; right=39; space=32
 		keysender="keybd_event"
-	except:
+	except: # TODO: Un-bare this except
 		# No win32api. Try crikey.
 		if os.system('crikey')==0:
 			def dokey(key1,key2=""):
@@ -66,7 +77,7 @@ else:
 		def invoke(object):
 			win32api.ShellExecute(0,None,object,None,None,0)
 		invoker="ShellExecute"
-	except:
+	except: # TODO: Un-bare this except
 		if os.system('gnome-open')==256: # This will produce some screen output. I don't really care. (Redirecting STDERR to the null device is either "2>nul" or "2>/dev/null" but how can I tell which?)
 			def invoke(object):
 				os.system("gnome-open '"+object.replace("'",r"'\''")+"'")
@@ -76,15 +87,15 @@ else:
 			print("Unable to invoke movies.")
 			invoker="no invoker"
 
-print("Using",invoker,"and",keysender)
+print("Using %s and %s"%(invoker,keysender))
 
-class VideosHTTP(http.server.BaseHTTPRequestHandler):
+class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 	def noresp(self):
 			self.send_response(200)
 			self.send_header("Content-type","text/plain")
 			self.send_header("Content-length",0)
 			self.end_headers()
-			self.wfile.close()
+			# self.wfile.close()
 
 	def do_GET(self):
 		# print self.path
@@ -114,18 +125,18 @@ class VideosHTTP(http.server.BaseHTTPRequestHandler):
 			self.noresp()
 			return
 		# Base path is actually used only once.
-		realpath=os.path.join(basepath,urllib.parse.unquote(self.path[1:]).replace("/",os.sep))
+		realpath=os.path.join(basepath,unquote(self.path[1:]).replace("/",os.sep))
 		try:
 			os.stat(realpath)
 			if not realpath.endswith(os.sep) and os.path.isdir(realpath):
 				realpath=realpath+os.sep
 				self.path=self.path+"/"
-		except:
+		except FileNotFoundError:
 			# File not found --> 404 Not Found. A perfect match.
 			self.send_response(404)
 			self.send_header("Content-type","text/plain")
 			self.end_headers()
-			self.wfile.write("Not found, sorry mate!\r\n")
+			self.wfile.write(b"Not found, sorry mate!\r\n")
 			return
 		if realpath.endswith(os.sep):
 			if os.path.isdir(os.path.join(realpath,"VIDEO_TS")):
@@ -139,7 +150,7 @@ class VideosHTTP(http.server.BaseHTTPRequestHandler):
 			self.send_header("Content-type","text/html")
 			self.end_headers()
 			self.wfile.write(
-"""<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+b"""<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -173,22 +184,22 @@ function docmd(c)
 				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
 					files.append(d+"/")
 				else:
-					self.wfile.write('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,d,d))
+					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,d,d)).encode('UTF-8'))
 			files.sort(key=str.lower)
-			self.wfile.write("</ul><ul>")
+			self.wfile.write(b"</ul><ul>")
 			index=None
 			for f in files:
 				if f=='00index.txt':
 					index=open(os.path.join(realpath,f)).read()
 				else:
-					self.wfile.write('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,f,f))
-			self.wfile.write("\n</ul>\n")
+					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,f,f)).encode('UTF-8'))
+			self.wfile.write(b"\n</ul>\n")
 			if index!=None:
-				self.wfile.write('<div style="background-color: #ddf; margin: 0 100px 0 100px">'
-					+xml.sax.saxutils.escape(index).replace("\r","").replace("\n","<br>")
-					+'</div>')
+				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">'
+					+xml.sax.saxutils.escape(index).replace("\r","").replace("\n","<br>").encode('UTF-8')
+					+b'</div>')
 			self.wfile.write(
-"""
+b"""
 <iframe name="discard" id="discard" frameborder="0" width="0" height="0">&nbsp;</iframe>
 </body>
 </html>
@@ -201,7 +212,7 @@ function docmd(c)
 	server_version="Videos/0.1"
 
 try:
-	server=http.server.HTTPServer(("",port),VideosHTTP)
+	server=BaseHTTPServer.HTTPServer(("",port),VideosHTTP)
 	print("Server active");
 	server.serve_forever();
 except KeyboardInterrupt:
