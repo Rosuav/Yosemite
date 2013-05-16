@@ -7,6 +7,7 @@
 #       http://www.shallowsky.com/software/crikey/ (you'll need to build it)
 # If there is a file called 00index.txt in a directory, it will be displayed in the directory listing.
 # Directories that look like DVDs (those that have a VIDEO_TS subfolder) will be treated as invokable.
+# TODO: Replace os.system() with a popen call - preferably don't wait() on them.
 
 import os
 try:
@@ -54,7 +55,7 @@ else: # Try some platform-specific methods.
 			win32api.keybd_event(key1,0,2,0)
 		shift=16; ctrl=17; left=37; right=39; space=32
 		keysender="keybd_event"
-	except: # TODO: Un-bare this except
+	except ImportError:
 		# No win32api. Try crikey.
 		if os.system('crikey')==0:
 			def dokey(key1,key2=""):
@@ -77,7 +78,7 @@ else:
 		def invoke(object):
 			win32api.ShellExecute(0,None,object,None,None,0)
 		invoker="ShellExecute"
-	except: # TODO: Un-bare this except
+	except ImportError:
 		if os.system('gnome-open')==256: # This will produce some screen output. I don't really care. (Redirecting STDERR to the null device is either "2>nul" or "2>/dev/null" but how can I tell which?)
 			def invoke(object):
 				os.system("gnome-open '"+object.replace("'",r"'\''")+"'")
