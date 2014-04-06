@@ -188,17 +188,33 @@ function docmd(c)
 					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,d,d)).encode('UTF-8'))
 			files.sort(key=str.lower)
 			self.wfile.write(b"</ul><ul>")
-			index=None
 			for f in files:
-				if f=='00index.txt':
-					index=open(os.path.join(realpath,f)).read()
-				else:
+				if f!='00index.txt':
 					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,f,f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
-			if index!=None:
-				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">'
-					+xml.sax.saxutils.escape(index).replace("\r","").replace("\n","<br>").encode('UTF-8')
-					+b'</div>')
+			if '00index.txt' in files:
+				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">')
+				with open(os.path.join(realpath,'00index.txt')) as index:
+					for line in index:
+						line = line.strip()
+						if line.startswith("/") and os.path.exists(os.path.join(realpath, line[1:])):
+							line = line[1:]
+							# The line appears to be a valid file name. Turn it into a link.
+							if (not os.path.isdir(os.path.join(realpath, line)) or
+								os.path.isdir(os.path.join(realpath, line, "VIDEO_TS"))):
+								# It's a file (possibly a DVD directory).
+								line = '<a href="%s%s" target="discard">/%s</a>'%(self.path, line, line)
+							else:
+								# It's a non-DVD directory
+								line = '<a href="%s%s/">/%s/</a>'%(self.path, line, line)
+						# In Python 3, we've been working with text (Unicode) strings.
+						# In Python 2, we've been working with byte strings.
+						# I don't know of a convenient notation for "encode this without
+						# throwing an error in Py2", other than this next line. :)
+						if bytes is not str: line = line.encode()
+						self.wfile.write(line+b"<br>\n")
+					
+				self.wfile.write(b'</div>')
 			self.wfile.write(
 b"""
 <iframe name="discard" id="discard" frameborder="0" width="0" height="0">&nbsp;</iframe>
