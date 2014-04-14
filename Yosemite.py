@@ -83,7 +83,7 @@ else:
 		invoker="ShellExecute"
 	except ImportError:
 		try:
-			Popen("gnome-open") # TODO: Redirect stderr to nowhere
+			Popen("gnome-open",stderr=open(os.devnull,"w"))
 			def invoke(object):
 				Popen(["gnome-open",object])
 				if keysender=="crikey": Popen(["crikey","-s","1","\27f"]); # I've no idea what the \27 is there for. ???
