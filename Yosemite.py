@@ -7,9 +7,9 @@
 #       http://www.shallowsky.com/software/crikey/ (you'll need to build it)
 # If there is a file called 00index.txt in a directory, it will be displayed in the directory listing.
 # Directories that look like DVDs (those that have a VIDEO_TS subfolder) will be treated as invokable.
-# TODO: Replace os.system() with a popen call - preferably don't wait() on them.
 
 import os
+from subprocess import Popen
 try:
 	from urllib.parse import unquote # Python 3
 except ImportError:
@@ -57,12 +57,15 @@ else: # Try some platform-specific methods.
 		keysender="keybd_event"
 	except ImportError:
 		# No win32api. Try crikey.
-		if os.system('crikey')==0:
+		try:
+			Popen("crikey")
+			# If nothing is raised, we can use crikey.
 			def dokey(key1,key2=""):
-				os.system("crikey '"+key1+key2+"'")
+				Popen(["crikey", key1+key2])
 			shift="\\S"; ctrl="\\C"; left="\\(Left\\)"; right="\\(Right\\)"; space=" "
 			keysender="crikey"
-		else:
+		except FileNotFoundError:
+			# No crikey found in system path
 			def dokey(key1,key2=None):
 				pass # No key sending available
 			print("Unable to send keys.")
@@ -79,12 +82,13 @@ else:
 			win32api.ShellExecute(0,None,object,None,None,0)
 		invoker="ShellExecute"
 	except ImportError:
-		if os.system('gnome-open')==256: # This will produce some screen output. I don't really care. (Redirecting STDERR to the null device is either "2>nul" or "2>/dev/null" but how can I tell which?)
+		try:
+			Popen("gnome-open") # TODO: Redirect stderr to nowhere
 			def invoke(object):
-				os.system("gnome-open '"+object.replace("'",r"'\''")+"'")
-				if keysender=="crikey": os.system("crikey -s 1 '\27f'");
+				Popen(["gnome-open",object])
+				if keysender=="crikey": Popen(["crikey","-s","1","\27f"]); # I've no idea what the \27 is there for. ???
 			invoker="gnome-open"
-		else:
+		except FileNotFoundError:
 			print("Unable to invoke movies.")
 			invoker="no invoker"
 
