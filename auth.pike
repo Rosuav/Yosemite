@@ -10,6 +10,11 @@ $ chmod +x yos
 $ ./yos
 
 TODO: Make this more generic. It's currently specific to my own LAN.
+
+Setup:
+* Create new account 'yosemite', create .ssh/authorized_keys, clean out everything else in ~ and mark it all read-only except authorized_keys itself
+* Ensure that acct yosemite has read-only access to /video
+
 */
 
 void request(Protocols.HTTP.Server.Request req)
