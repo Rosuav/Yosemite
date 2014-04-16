@@ -86,7 +86,8 @@ else:
 			Popen("gnome-open",stderr=open(os.devnull,"w"))
 			def invoke(object):
 				Popen(["gnome-open",object])
-				if keysender=="crikey": Popen(["crikey","-s","1","\27f"]); # I've no idea what the \27 is there for. ???
+				# Optionally send an 'f' to toggle full-screen
+				# if keysender=="crikey": Popen(["crikey","-s","1","\27f"]); # I've no idea what the \27 is there for. ???
 			invoker="gnome-open"
 		except FileNotFoundError:
 			print("Unable to invoke movies.")
