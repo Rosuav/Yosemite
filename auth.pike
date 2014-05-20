@@ -54,7 +54,7 @@ cd
 # Try to authenticate with the server, logging to .yos_authority
 # If the authentication fails or is revoked, remove that file to re-attempt.
 [ -f .yos_authority ] || wget huix/.yos_authority --post-file .ssh/id_rsa.pub -q
-sshfs yosemite@huix:/video/ /video
+sshfs yosemite@" + (req->request_headers->host || "huix") + #":/video/ /video
 cd /video
 python Yosemite.py
 "])); break;
