@@ -32,14 +32,24 @@ void request(Protocols.HTTP.Server.Request req)
 Description=Yosemite Project
 
 [Service]
+# The user, path, and X display are derived at installation time
+# from the attributes of the yos script. Reinstall to reset them.
 Environment=DISPLAY=$DISPLAY
 User=`stat -c %u $0`
 ExecStart=`readlink -e $0`
+# If the network isn't available yet, restart until it is.
+Restart=on-failure
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
 \" >/etc/systemd/system/yos.service
+	# Note that some of this will fail if systemd is installed
+	# but isn't the default init system. In that case, well, you
+	# can't use this method of autostarting. TODO: Provide some
+	# other ways to autostart (eg for Upstart and/or sysvinit).
 	systemctl --system daemon-reload
+	systemctl enable yos.service
 	echo Installed as yos.service.
 	systemctl start yos.service
 	exit
