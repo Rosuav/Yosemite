@@ -11,6 +11,9 @@ $ ./yos
 
 TODO: Make this more generic. It's currently specific to my own LAN.
 
+To install under systemd:
+$ sudo ./yos install
+
 Setup:
 * Create new account 'yosemite', create .ssh/authorized_keys, clean out everything else in ~ and mark it all read-only except authorized_keys itself
 * Ensure that acct yosemite has read-only access to /video
@@ -24,6 +27,23 @@ void request(Protocols.HTTP.Server.Request req)
 		//Return the script used for connecting.
 		case "/yos": req->response_and_finish((["data":
 #"#!/bin/bash
+[ \"$1\" = \"install\" ] && [ -d /etc/systemd/system ] && {
+	echo \"[Unit]
+Description=Yosemite Project
+
+[Service]
+Environment=DISPLAY=$DISPLAY
+User=`stat -c %u $0`
+ExecStart=`readlink -e $0`
+
+[Install]
+WantedBy=multi-user.target
+\" >/etc/systemd/system/yos.service
+	systemctl --system daemon-reload
+	echo Installed as yos.service.
+	systemctl start yos.service
+	exit
+}
 cd
 # Ensure we have a keypair to use
 [ -d .ssh ] || mkdir .ssh
