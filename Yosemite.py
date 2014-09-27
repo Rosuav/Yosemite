@@ -82,14 +82,18 @@ else:
 			win32api.ShellExecute(0,None,object,None,None,0)
 		invoker="ShellExecute"
 	except ImportError:
-		try:
-			Popen("gnome-open",stderr=open(os.devnull,"w"))
+		for invoker in ("xdg-open", "exo-open", "gnome-open", "kde-open", None):
+			try:
+				if invoker: Popen(invoker,stderr=open(os.devnull,"w"),stdout=open(os.devnull,"w"))
+				break # Once one succeeds, use it.
+			except FileNotFoundError:
+				pass
+		if invoker:
 			def invoke(object):
-				Popen(["gnome-open",object])
+				Popen([invoker,object])
 				# Optionally send an 'f' to toggle full-screen
 				# if keysender=="crikey": Popen(["crikey","-s","1","\27f"]); # I've no idea what the \27 is there for. ???
-			invoker="gnome-open"
-		except FileNotFoundError:
+		else:
 			print("Unable to invoke movies.")
 			invoker="no invoker"
 
