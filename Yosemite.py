@@ -194,11 +194,13 @@ function docmd(c)
 				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
 					files.append(d+"/")
 				else:
+					if str is bytes: d=d.decode('UTF-8')
 					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,d,d)).encode('UTF-8'))
 			files.sort(key=str.lower)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
 				if f!='00index.txt':
+					if str is bytes: f=f.decode('UTF-8')
 					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,f,f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
 			if '00index.txt' in files:
@@ -220,6 +222,10 @@ function docmd(c)
 						# In Python 2, we've been working with byte strings.
 						# I don't know of a convenient notation for "encode this without
 						# throwing an error in Py2", other than this next line. :)
+						# Note that as of Python 3.5, it may be possible to use bytes
+						# interpolation (PEP 461) and work entirely in bytes on both
+						# versions. However, until I can drop support for Python 3.0-3.4,
+						# this won't help, so the encode/decode dance will have to stay.
 						if bytes is not str: line = line.encode()
 						self.wfile.write(line+b"<br>\n")
 					
