@@ -148,6 +148,10 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 			self.end_headers()
 			self.wfile.write(b"Not found, sorry mate!\r\n")
 			return
+		indexonly = realpath.endswith(os.sep+"00index.txt")
+		if indexonly:
+			realpath = realpath[:-11] # which will then go through the next block.
+			self.path = self.path[:-11]
 		if realpath.endswith(os.sep):
 			if os.path.isdir(os.path.join(realpath,"VIDEO_TS")):
 				if dvdcmd!=None:
@@ -187,9 +191,12 @@ function docmd(c)
 </div>
 <ul>
 """)
-			(path,dirs,files)=next(os.walk(realpath))
-			dirs.sort(key=str.lower);
-			if self.path!='/': dirs.insert(0,"..")
+			if indexonly:
+				dirs=files=[]
+			else:
+				(path,dirs,files)=next(os.walk(realpath))
+				dirs.sort(key=str.lower);
+				if self.path!='/': dirs.insert(0,"..")
 			for d in dirs:
 				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
 					files.append(d+"/")
@@ -203,7 +210,7 @@ function docmd(c)
 					if str is bytes: f=f.decode('UTF-8')
 					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,f,f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
-			if '00index.txt' in files:
+			if indexonly or '00index.txt' in files:
 				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">')
 				with open(os.path.join(realpath,'00index.txt')) as index:
 					for line in index:
