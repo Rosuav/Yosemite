@@ -10,6 +10,7 @@
 
 import os
 from subprocess import Popen
+import collections
 try:
 	from urllib.parse import unquote # Python 3
 except ImportError:
@@ -99,6 +100,10 @@ else:
 
 print("Using %s and %s"%(invoker,keysender))
 
+# Every file invocation gets counted. This makes for a crude popularity count,
+# but note that this is not retained across server restarts.
+usage = collections.Counter()
+
 class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 	def noresp(self):
 			self.send_response(200)
@@ -108,7 +113,6 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 			# self.wfile.close()
 
 	def do_GET(self):
-		# print self.path
 		if self.path=="/fwd1":
 			dokey(shift,right)
 			self.noresp()
@@ -134,6 +138,16 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 				os.system(abortcmd)
 			self.noresp()
 			return
+		# By default, sort by name, case-folded. Py2 doesn't have such,
+		# so we just lower-case. But we might change the sort key below.
+		try: sortkey = str.casefold
+		except AttributeError: sortkey = str.lower
+		if '?' in self.path:
+			self.path, querystring = self.path.split("?", 1)
+			if querystring == "popular":
+				print(usage)
+				def sortkey(fn):
+					return usage[os.path.join(realpath,fn)], fn.lower()
 		# Base path is actually used only once.
 		realpath=os.path.join(basepath,unquote(self.path[1:]).replace("/",os.sep))
 		try:
@@ -157,6 +171,7 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 				if dvdcmd!=None:
 					os.system(dvdcmd%realpath[:-1])
 				else:
+					usage[realpath] += 1
 					invoke(realpath)
 				self.noresp()
 				return
@@ -195,7 +210,7 @@ function docmd(c)
 				dirs=files=[]
 			else:
 				(path,dirs,files)=next(os.walk(realpath))
-				dirs.sort(key=str.lower);
+				dirs.sort(key=sortkey)
 				if self.path!='/': dirs.insert(0,"..")
 			for d in dirs:
 				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
@@ -203,7 +218,7 @@ function docmd(c)
 				else:
 					if str is bytes: d=d.decode('UTF-8')
 					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,d,d)).encode('UTF-8'))
-			files.sort(key=str.lower)
+			files.sort(key=sortkey)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
 				if f!='00index.txt':
@@ -244,6 +259,7 @@ b"""
 </html>
 """)
 			return
+		usage[realpath] += 1
 		invoke(realpath)
 		self.noresp()
 		return
