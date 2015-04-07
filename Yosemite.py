@@ -133,6 +133,14 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 			dokey(ctrl,left)
 			self.noresp()
 			return
+		if self.path=="/nextsrt":
+			dokey('v')
+			self.noresp()
+			return
+		if self.path=="/nextaud":
+			dokey('b')
+			self.noresp()
+			return
 		if self.path=="/stop":
 			if abortcmd!=None:
 				os.system(abortcmd)
