@@ -12,9 +12,9 @@ import os
 from subprocess import Popen
 import collections
 try:
-	from urllib.parse import unquote # Python 3
+	from urllib.parse import quote, unquote # Python 3
 except ImportError:
-	from urllib import unquote # Python 2
+	from urllib import quote, unquote # Python 2
 try:
 	import http.server as BaseHTTPServer # Python 3
 except ImportError:
@@ -225,13 +225,13 @@ function docmd(c)
 					files.append(d+"/")
 				else:
 					if str is bytes: d=d.decode('UTF-8')
-					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,d,d)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s/">%s/</a></li>\n'%(quote(self.path+d),d)).encode('UTF-8'))
 			files.sort(key=sortkey)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
 				if f!='00index.txt':
 					if str is bytes: f=f.decode('UTF-8')
-					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,f,f)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s" target="discard">%s</a></li>\n'%(quote(self.path+f),f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
 			if indexonly or '00index.txt' in files:
 				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">')
