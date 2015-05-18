@@ -244,10 +244,10 @@ function docmd(c)
 							if (not os.path.isdir(os.path.join(realpath, line)) or
 								os.path.isdir(os.path.join(realpath, line, "VIDEO_TS"))):
 								# It's a file (possibly a DVD directory).
-								line = '<a href="%s%s" target="discard">/%s</a>'%(self.path, line, line)
+								line = '<a href="%s" target="discard">/%s</a>'%(quote(self.path+line), line)
 							else:
 								# It's a non-DVD directory
-								line = '<a href="%s%s/">/%s/</a>'%(self.path, line, line)
+								line = '<a href="%s/">/%s/</a>'%(quote(self.path+line), line)
 						# In Python 3, we've been working with text (Unicode) strings.
 						# In Python 2, we've been working with byte strings.
 						# I don't know of a convenient notation for "encode this without
