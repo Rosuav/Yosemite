@@ -22,7 +22,7 @@ except ImportError:
 		return urllib.quote(fn)
 	def unquote(uri):
 		"""Unquote a URI and decode it to Unicode"""
-		return urllib.unquote(uri).decode("utf-8")
+		return urllib.unquote(uri) #.decode("utf-8") # hack
 try:
 	import http.server as BaseHTTPServer # Python 3
 except ImportError:
@@ -233,13 +233,13 @@ function docmd(c)
 					files.append(d+"/")
 				else:
 					if str is bytes: d=d.decode('UTF-8')
-					self.wfile.write(('<li><a href="%s/">%s/</a></li>\n'%(quote(self.path+d),d)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,quote(d),d)).encode('UTF-8'))
 			files.sort(key=sortkey)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
 				if f!='00index.txt':
 					if str is bytes: f=f.decode('UTF-8')
-					self.wfile.write(('<li><a href="%s" target="discard">%s</a></li>\n'%(quote(self.path+f),f)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,quote(f),f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
 			if indexonly or '00index.txt' in files:
 				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">')
@@ -252,10 +252,10 @@ function docmd(c)
 							if (not os.path.isdir(os.path.join(realpath, line)) or
 								os.path.isdir(os.path.join(realpath, line, "VIDEO_TS"))):
 								# It's a file (possibly a DVD directory).
-								line = '<a href="%s" target="discard">/%s</a>'%(quote(self.path+line), line)
+								line = '<a href="%s%s" target="discard">/%s</a>'%(self.path, quote(line), line)
 							else:
 								# It's a non-DVD directory
-								line = '<a href="%s/">/%s/</a>'%(quote(self.path+line), line)
+								line = '<a href="%s%s/">/%s/</a>'%(self.path, quote(line), line)
 						# In Python 3, we've been working with text (Unicode) strings.
 						# In Python 2, we've been working with byte strings.
 						# I don't know of a convenient notation for "encode this without
