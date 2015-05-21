@@ -14,7 +14,12 @@ import collections
 try:
 	from urllib.parse import quote, unquote # Python 3
 except ImportError:
-	from urllib import quote, unquote # Python 2
+	from urllib import quote as _quote, unquote # Python 2
+	# This wrapper isn't needed in Py3.
+	def quote(fn):
+		"""Quote a file name for use in a URL - automatically UTF-8 encodes Unicode strings"""
+		if isinstance(fn, unicode): fn.encode("utf-8")
+		return _quote(fn)
 try:
 	import http.server as BaseHTTPServer # Python 3
 except ImportError:
