@@ -18,7 +18,7 @@ except ImportError:
 	# This wrapper isn't needed in Py3.
 	def quote(fn):
 		"""Quote a file name for use in a URL - automatically UTF-8 encodes Unicode strings"""
-		if isinstance(fn, unicode): fn.encode("utf-8")
+		if isinstance(fn, unicode): fn = fn.encode("utf-8")
 		return _quote(fn)
 try:
 	import http.server as BaseHTTPServer # Python 3
