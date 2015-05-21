@@ -22,7 +22,7 @@ except ImportError:
 		return urllib.quote(fn)
 	def unquote(uri):
 		"""Unquote a URI and decode it to Unicode"""
-		return urllib.quote(fn).decode("utf-8")
+		return urllib.unquote(uri).decode("utf-8")
 try:
 	import http.server as BaseHTTPServer # Python 3
 except ImportError:
