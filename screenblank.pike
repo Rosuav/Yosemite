@@ -6,7 +6,7 @@
 
 int main(int argc,array(string) argv)
 {
-	if (argc<2) exit(1,"USAGE: %s output_to_operate\nOr run 'sudo %<s install output_to_operate' to create a systemd service.\n");
+	if (argc<2) exit(1,"USAGE: %s output_to_operate\nOr run 'sudo %<s install output_to_operate' to create a systemd service.\n",argv[0]);
 	if (argc>2 && argv[1]=="install")
 	{
 		Stdio.write_file("/etc/systemd/system/screenblank.service",sprintf(#"[Unit]
