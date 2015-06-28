@@ -227,6 +227,8 @@ function docmd(c)
 			else:
 				(path,dirs,files)=next(os.walk(realpath))
 				dirs.sort(key=sortkey)
+				dirs = [dir for dir in dirs if not dir.startswith(".")]
+				files = [file for file in files if not file.startswith(".")]
 				if self.path!='/': dirs.insert(0,"..")
 			for d in dirs:
 				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
