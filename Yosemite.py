@@ -155,7 +155,7 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 				os.system(abortcmd)
 			self.noresp()
 			return
-		if self.path=="/popular":
+		if self.path=="/popular.json":
 			self.send_response(200)
 			self.send_header("Content-type","application/json")
 			self.end_headers()
