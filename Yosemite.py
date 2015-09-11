@@ -9,6 +9,7 @@
 # Directories that look like DVDs (those that have a VIDEO_TS subfolder) will be treated as invokable.
 
 import os
+import json
 from subprocess import Popen
 import collections
 try:
@@ -154,6 +155,12 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 				os.system(abortcmd)
 			self.noresp()
 			return
+		if self.path=="/popular":
+			self.send_response(200)
+			self.send_header("Content-type","application/json")
+			self.end_headers()
+			self.wfile.write(json.dumps(usage).encode("ascii"))
+			return
 		# By default, sort by name, case-folded. Py2 doesn't have such,
 		# so we just lower-case. But we might change the sort key below.
 		try: sortkey = str.casefold
@@ -161,7 +168,6 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 		if '?' in self.path:
 			self.path, querystring = self.path.split("?", 1)
 			if querystring == "popular":
-				print(usage)
 				def sortkey(fn):
 					return usage[os.path.join(realpath,fn)], fn.lower()
 		# Base path is actually used only once.
