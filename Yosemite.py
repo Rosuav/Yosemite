@@ -173,8 +173,8 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 		# Base path is actually used only once.
 		realpath=os.path.join(basepath,unquote(self.path[1:]).replace("/",os.sep))
 		if realpath.endswith('*'):
-			if dircmd is not None:
-				os.system(dircmd%realpath[:-1])
+			if playall is not None:
+				os.system(playall%realpath[:-1])
 			else:
 				invoke(realpath[:-1])
 			self.send_response(301)
