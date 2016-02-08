@@ -172,6 +172,15 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 					return usage[os.path.join(realpath,fn)], fn.lower()
 		# Base path is actually used only once.
 		realpath=os.path.join(basepath,unquote(self.path[1:]).replace("/",os.sep))
+		if realpath.endswith('*'):
+			if dircmd is not None:
+				os.system(dircmd%realpath[:-1])
+			else:
+				invoke(realpath[:-1])
+			self.send_response(301)
+			self.send_header("Location", self.path[:-1])
+			self.end_headers()
+			return
 		try:
 			os.stat(realpath)
 			if not realpath.endswith(os.sep) and os.path.isdir(realpath):
@@ -228,6 +237,7 @@ function docmd(c)
 <input type="button" value="Stop all" onclick="docmd('stop')">
 </div>
 </div>
+<a href="*">Play all</a>
 <ul>
 """)
 			if indexonly:
