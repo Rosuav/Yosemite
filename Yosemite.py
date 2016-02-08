@@ -175,8 +175,10 @@ class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
 		try:
 			os.stat(realpath)
 			if not realpath.endswith(os.sep) and os.path.isdir(realpath):
-				realpath=realpath+os.sep
-				self.path=self.path+"/"
+				self.send_response(301)
+				self.send_header("Location", self.path+"/")
+				self.end_headers()
+				return
 		except FileNotFoundError:
 			# File not found --> 404 Not Found. A perfect match.
 			self.send_response(404)
