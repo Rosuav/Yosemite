@@ -64,7 +64,7 @@ cd
 [ -d /video ] || mkdir /video 2>/dev/null || { sudo mkdir /video 2>/dev/null && sudo chown $USER: /video; }
 # Try to authenticate with the server, logging to .yos_authority
 # If the authentication fails or is revoked, remove that file to re-attempt.
-[ -f .yos_authority ] || wget %<s/.yos_authority --post-file .ssh/id_rsa.pub -q
+[ -f .yos_authority ] || wget %s/.yos_authority --post-file .ssh/id_rsa.pub -q
 sshfs yosemite@%<s:/video/ /video -oStrictHostKeyChecking=no
 cd /video
 [ \"$1\" != \"reconnect\" ] && exit 0
