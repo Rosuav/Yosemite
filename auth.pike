@@ -67,7 +67,7 @@ cd
 [ -f .yos_authority ] || wget %s/.yos_authority --post-file .ssh/id_rsa.pub -q
 sshfs yosemite@%<s:/video/ /video -oStrictHostKeyChecking=no
 cd /video
-[ \"$1\" != \"reconnect\" ] && exit 0
+[ \"$1\" = \"reconnect\" ] && exit 0
 python Yosemite.py
 ", req->request_headers->host || "huix")])); break;
 		case "/.yos_authority": if (req->body_raw!="")
