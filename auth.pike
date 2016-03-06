@@ -37,6 +37,7 @@ Description=Yosemite Project
 Environment=DISPLAY=$DISPLAY
 User=`stat -c %%u $0`
 ExecStart=`readlink -e $0`
+ExecReload=`readlink -e $0` reconnect
 # If the network isn't available yet, restart until it is.
 Restart=on-failure
 RestartSec=10
@@ -66,6 +67,7 @@ cd
 [ -f .yos_authority ] || wget %<s/.yos_authority --post-file .ssh/id_rsa.pub -q
 sshfs yosemite@%<s:/video/ /video -oStrictHostKeyChecking=no
 cd /video
+[ \"$1\" != \"reconnect\" ] && exit 0
 python Yosemite.py
 ", req->request_headers->host || "huix")])); break;
 		case "/.yos_authority": if (req->body_raw!="")
