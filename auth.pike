@@ -25,7 +25,7 @@ void request(Protocols.HTTP.Server.Request req)
 	switch (req->not_query)
 	{
 		//Return the script used for connecting.
-		case "/yos": req->response_and_finish((["data":
+		case "/yos": req->response_and_finish((["data":sprintf(
 #"#!/bin/bash
 [ \"$1\" = \"install\" ] && [ -d /etc/systemd/system ] && {
 	echo \"[Unit]
@@ -35,7 +35,7 @@ Description=Yosemite Project
 # The user, path, and X display are derived at installation time
 # from the attributes of the yos script. Reinstall to reset them.
 Environment=DISPLAY=$DISPLAY
-User=`stat -c %u $0`
+User=`stat -c %%u $0`
 ExecStart=`readlink -e $0`
 # If the network isn't available yet, restart until it is.
 Restart=on-failure
@@ -63,11 +63,11 @@ cd
 [ -d /video ] || mkdir /video 2>/dev/null || { sudo mkdir /video 2>/dev/null && sudo chown $USER: /video; }
 # Try to authenticate with the server, logging to .yos_authority
 # If the authentication fails or is revoked, remove that file to re-attempt.
-[ -f .yos_authority ] || wget " + (req->request_headers->host || "huix") + #"/.yos_authority --post-file .ssh/id_rsa.pub -q
-sshfs yosemite@" + (req->request_headers->host || "huix") + #":/video/ /video -oStrictHostKeyChecking=no
+[ -f .yos_authority ] || wget %<s/.yos_authority --post-file .ssh/id_rsa.pub -q
+sshfs yosemite@%<s:/video/ /video -oStrictHostKeyChecking=no
 cd /video
 python Yosemite.py
-"])); break;
+", req->request_headers->host || "huix")])); break;
 		case "/.yos_authority": if (req->body_raw!="")
 		{
 			//TODO: Check for duplicates (maybe by ignoring the key and
