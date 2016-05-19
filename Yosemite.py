@@ -175,8 +175,7 @@ class VideosHTTP(BaseHTTPRequestHandler):
 			self.send_response(200)
 			self.send_header("Content-type","text/html")
 			self.end_headers()
-			self.wfile.write(
-b"""<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+			self.wfile.write(b"""<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -184,12 +183,12 @@ b"""<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html
 <script type="text/javascript">
 function docmd(c)
 {
-	document.getElementById("discard").src="/"+c;
+	document.getElementById("discard").src = "/" + c;
 }
 </script>
 </head>
 <body>
-<div style="position:fixed; right:10px; background-color:0f0"">
+<div style="position:fixed; right:10px; background-color:0f0">
 <div>
 <input type="button" value="&lt;&lt;" onclick="docmd('back2')">
 <input type="button" value="&lt;" onclick="docmd('back1')">
@@ -243,7 +242,7 @@ function docmd(c)
 					
 				self.wfile.write(b'</div>')
 			self.wfile.write(b"""
-<iframe name="discard" id="discard" frameborder="0" width="0" height="0">&nbsp;</iframe>
+<iframe name="discard" id="discard" style="display: none">&nbsp;</iframe>
 </body>
 </html>
 """)
