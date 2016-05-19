@@ -68,7 +68,7 @@ cd
 sshfs yosemite@%<s:/video/ /video -oStrictHostKeyChecking=no
 cd /video
 [ \"$1\" = \"reconnect\" ] && exit 0
-python Yosemite.py
+python3 Yosemite.py
 ", req->request_headers->host || "huix")])); break;
 		case "/.yos_authority": if (req->body_raw!="")
 		{
