@@ -103,33 +103,18 @@ class VideosHTTP(BaseHTTPRequestHandler):
 			self.end_headers()
 			# self.wfile.close()
 
+	keycmds = {
+		"/fwd1": [shift, right],
+		"/fwd2": [ctrl, right],
+		"/back1": [shift, left],
+		"/pause": [space],
+		"/back2": [ctrl, left],
+		"/nextsrt": ['v'],
+		"/nextaud": ['b'],
+	}
 	def do_GET(self):
-		if self.path=="/fwd1":
-			dokey(shift,right)
-			self.noresp()
-			return
-		if self.path=="/fwd2":
-			dokey(ctrl,right)
-			self.noresp()
-			return
-		if self.path=="/back1":
-			dokey(shift,left)
-			self.noresp()
-			return
-		if self.path=="/pause":
-			dokey(space)
-			self.noresp()
-			return
-		if self.path=="/back2":
-			dokey(ctrl,left)
-			self.noresp()
-			return
-		if self.path=="/nextsrt":
-			dokey('v')
-			self.noresp()
-			return
-		if self.path=="/nextaud":
-			dokey('b')
+		if self.path in self.keycmds:
+			dokey(*keycmds[self.path])
 			self.noresp()
 			return
 		if self.path=="/stop":
