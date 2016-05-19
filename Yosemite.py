@@ -17,6 +17,7 @@ import collections
 from urllib.parse import quote, unquote # ImportError? Change 'python' to 'python3' in ~/yos to fix it.
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import xml.sax.saxutils
+import shlex
 from config import * # Get the user config (see config.py)
 
 if usevnc: # Send keys via VNC. Works on any platform, as long as there's a VNC server running.
@@ -251,8 +252,29 @@ function docmd(c)
 </html>
 """)
 			return
+		# Ordinary file. If there's a .yosemite config file in the same dir,
+		# it might change things; otherwise, we use regular invocation.
 		usage[realpath] += 1
-		invoke(realpath)
+		config = os.path.join(os.path.dirname(realpath), ".yosemite")
+		conf = {}
+		try:
+			# There's currently only one thing we're looking for,
+			# and that's an alternative invokecmd. But parse the
+			# file more fully.
+			with open(config, encoding="utf-8") as f:
+				for line in f:
+					if ":" not in line: continue
+					key, val = line.split(":", 1)
+					conf[key.strip()] = val.strip()
+		except FileNotFoundError:
+			# No config file? Empty config.
+			pass
+		if "invokecmd" in conf:
+			# Replace %s with the file name, but keep the split of the command
+			# into words untouched. Spaces in realpath won't mess things up.
+			Popen([part.replace("%s", realpath) for part in shlex.split(conf["invokecmd"])])
+		else:
+			invoke(realpath)
 		self.noresp()
 		return
 
