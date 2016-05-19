@@ -12,29 +12,10 @@ import os
 import json
 from subprocess import Popen
 import collections
-try:
-	from urllib.parse import quote, unquote # Python 3
-except ImportError:
-	import urllib # Python 2
-	# These wrappers aren't needed in Py3 - we can just import quote and unquote directly.
-	def quote(fn):
-		"""Quote a file name for use in a URL - automatically UTF-8 encodes Unicode strings"""
-		if isinstance(fn, unicode): fn = fn.encode("utf-8")
-		return urllib.quote(fn)
-	def unquote(uri):
-		"""Unquote a URI and decode it to Unicode"""
-		return urllib.unquote(uri) #.decode("utf-8") # hack
-try:
-	import http.server as BaseHTTPServer # Python 3
-except ImportError:
-	import BaseHTTPServer # Python 2
+from urllib.parse import quote, unquote
+import http.server as BaseHTTPServer
 import xml.sax.saxutils
 from config import * # Get the user config (see config.py)
-
-try:
-	FileNotFoundError
-except NameError:
-	FileNotFoundError=OSError
 
 if usevnc: # Send keys via VNC. Works on any platform, as long as there's a VNC server running.
 	print("Connecting to VNC")
@@ -252,13 +233,11 @@ function docmd(c)
 				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
 					files.append(d+"/")
 				else:
-					if str is bytes: d=d.decode('UTF-8')
 					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,quote(d),d)).encode('UTF-8'))
 			files.sort(key=sortkey)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
 				if f!='00index.txt':
-					if str is bytes: f=f.decode('UTF-8')
 					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,quote(f),f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
 			if indexonly or '00index.txt' in files:
@@ -276,15 +255,7 @@ function docmd(c)
 							else:
 								# It's a non-DVD directory
 								line = '<a href="%s%s/">/%s/</a>'%(self.path, quote(line), line)
-						# In Python 3, we've been working with text (Unicode) strings.
-						# In Python 2, we've been working with byte strings.
-						# I don't know of a convenient notation for "encode this without
-						# throwing an error in Py2", other than this next line. :)
-						# Note that as of Python 3.5, it may be possible to use bytes
-						# interpolation (PEP 461) and work entirely in bytes on both
-						# versions. However, until I can drop support for Python 3.0-3.4,
-						# this won't help, so the encode/decode dance will have to stay.
-						if bytes is not str: line = line.encode()
+						line = line.encode("utf-8")
 						self.wfile.write(line+b"<br>\n")
 					
 				self.wfile.write(b'</div>')
