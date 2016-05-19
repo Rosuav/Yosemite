@@ -1,7 +1,7 @@
 The Yosemite project grew out of a plan to maintain and manage a collection of
 Looney Tunes videos, and is now a more generic manager for videos.
 
-Requires Python 2.7 or 3.4+ (may work on older 3.x but not tested).
+Requires Python 3.4+ (may work on older 3.x but not tested - but not 2.7).
 
 Requires a config file, config.py; see two examples in the repository.
 
