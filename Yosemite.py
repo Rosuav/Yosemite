@@ -13,7 +13,7 @@ import os
 import json
 from subprocess import Popen
 import collections
-from urllib.parse import quote, unquote
+from urllib.parse import quote, unquote # ImportError? Change 'python' to 'python3' in ~/yos to fix it.
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import xml.sax.saxutils
 from config import * # Get the user config (see config.py)
