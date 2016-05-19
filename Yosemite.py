@@ -117,31 +117,28 @@ class VideosHTTP(BaseHTTPRequestHandler):
 			dokey(*keycmds[self.path])
 			self.noresp()
 			return
-		if self.path=="/stop":
-			if abortcmd!=None:
+		if self.path == "/stop":
+			if abortcmd is not None:
 				os.system(abortcmd)
 			self.noresp()
 			return
-		if self.path=="/popular.json":
+		if self.path == "/popular.json":
 			self.send_response(200)
-			self.send_header("Content-type","application/json")
+			self.send_header("Content-type", "application/json")
 			self.end_headers()
 			self.wfile.write(json.dumps(usage).encode("ascii"))
 			return
-		# By default, sort by name, case-folded. Py2 doesn't have such,
-		# so we just lower-case. But we might change the sort key below.
-		try: sortkey = str.casefold
-		except AttributeError: sortkey = str.lower
+		sortkey = str.casefold
 		if '?' in self.path:
 			self.path, querystring = self.path.split("?", 1)
 			if querystring == "popular":
 				def sortkey(fn):
 					return usage[os.path.join(realpath,fn)], fn.lower()
 		# Base path is actually used only once.
-		realpath=os.path.join(basepath,unquote(self.path[1:]).replace("/",os.sep))
+		realpath = os.path.join(basepath, unquote(self.path[1:]).replace("/", os.sep))
 		if realpath.endswith('*'):
 			if playallcmd is not None:
-				os.system(playallcmd%realpath[:-1])
+				os.system(playallcmd % realpath[:-1])
 			else:
 				invoke(realpath[:-1])
 			self.send_response(301)
@@ -152,24 +149,24 @@ class VideosHTTP(BaseHTTPRequestHandler):
 			os.stat(realpath)
 			if not realpath.endswith(os.sep) and os.path.isdir(realpath):
 				self.send_response(301)
-				self.send_header("Location", self.path+"/")
+				self.send_header("Location", self.path + "/")
 				self.end_headers()
 				return
 		except FileNotFoundError:
 			# File not found --> 404 Not Found. A perfect match.
 			self.send_response(404)
-			self.send_header("Content-type","text/plain")
+			self.send_header("Content-type", "text/plain")
 			self.end_headers()
 			self.wfile.write(b"Not found, sorry mate!\r\n")
 			return
-		indexonly = realpath.endswith(os.sep+"00index.txt")
+		indexonly = realpath.endswith(os.sep + "00index.txt")
 		if indexonly:
 			realpath = realpath[:-11] # which will then go through the next block.
 			self.path = self.path[:-11]
 		if realpath.endswith(os.sep):
-			if os.path.isdir(os.path.join(realpath,"VIDEO_TS")):
-				if dvdcmd!=None:
-					os.system(dvdcmd%realpath[:-1])
+			if os.path.isdir(os.path.join(realpath, "VIDEO_TS")):
+				if dvdcmd is not None:
+					os.system(dvdcmd % realpath[:-1])
 				else:
 					usage[realpath] += 1
 					invoke(realpath)
@@ -208,23 +205,23 @@ function docmd(c)
 <ul>
 """)
 			if indexonly:
-				dirs=files=[]
+				dirs = files = ()
 			else:
-				(path,dirs,files)=next(os.walk(realpath))
+				path, dirs, files = next(os.walk(realpath))
 				dirs.sort(key=sortkey)
 				dirs = [dir for dir in dirs if not dir.startswith(".")]
 				files = [file for file in files if not file.startswith(".")]
 				if self.path!='/': dirs.insert(0,"..")
 			for d in dirs:
-				if os.path.isdir(os.path.join(realpath,d,"VIDEO_TS")):
-					files.append(d+"/")
+				if os.path.isdir(os.path.join(realpath, d, "VIDEO_TS")):
+					files.append(d + "/")
 				else:
-					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path,quote(d),d)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path, quote(d), d)).encode('UTF-8'))
 			files.sort(key=sortkey)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
-				if f!='00index.txt':
-					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'%(self.path,quote(f),f)).encode('UTF-8'))
+				if f != '00index.txt':
+					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n' % (self.path, quote(f), f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
 			if indexonly or '00index.txt' in files:
 				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">')
@@ -237,16 +234,15 @@ function docmd(c)
 							if (not os.path.isdir(os.path.join(realpath, line)) or
 								os.path.isdir(os.path.join(realpath, line, "VIDEO_TS"))):
 								# It's a file (possibly a DVD directory).
-								line = '<a href="%s%s" target="discard">/%s</a>'%(self.path, quote(line), line)
+								line = '<a href="%s%s" target="discard">/%s</a>' % (self.path, quote(line), line)
 							else:
 								# It's a non-DVD directory
-								line = '<a href="%s%s/">/%s/</a>'%(self.path, quote(line), line)
+								line = '<a href="%s%s/">/%s/</a>' % (self.path, quote(line), line)
 						line = line.encode("utf-8")
-						self.wfile.write(line+b"<br>\n")
+						self.wfile.write(line + b"<br>\n")
 					
 				self.wfile.write(b'</div>')
-			self.wfile.write(
-b"""
+			self.wfile.write(b"""
 <iframe name="discard" id="discard" frameborder="0" width="0" height="0">&nbsp;</iframe>
 </body>
 </html>
@@ -257,10 +253,10 @@ b"""
 		self.noresp()
 		return
 
-	server_version="Videos/0.1"
+	server_version = "Videos/0.1"
 
 try:
-	server=HTTPServer(("",port),VideosHTTP)
+	server = HTTPServer(("", port), VideosHTTP)
 	print("Server active");
 	server.serve_forever();
 except KeyboardInterrupt:
