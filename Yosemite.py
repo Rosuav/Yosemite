@@ -215,12 +215,14 @@ function docmd(c)
 				if os.path.isdir(os.path.join(realpath, d, "VIDEO_TS")):
 					files.append(d + "/")
 				else:
-					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'%(self.path, quote(d), d)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s%s/">%s/</a></li>\n'
+						% (self.path, quote(d), d)).encode('UTF-8'))
 			files.sort(key=sortkey)
 			self.wfile.write(b"</ul><ul>")
 			for f in files:
 				if f != '00index.txt':
-					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n' % (self.path, quote(f), f)).encode('UTF-8'))
+					self.wfile.write(('<li><a href="%s%s" target="discard">%s</a></li>\n'
+						% (self.path, quote(f), f)).encode('UTF-8'))
 			self.wfile.write(b"\n</ul>\n")
 			if indexonly or '00index.txt' in files:
 				self.wfile.write(b'<div style="background-color: #ddf; margin: 0 100px 0 100px">')
@@ -233,7 +235,8 @@ function docmd(c)
 							if (not os.path.isdir(os.path.join(realpath, line)) or
 								os.path.isdir(os.path.join(realpath, line, "VIDEO_TS"))):
 								# It's a file (possibly a DVD directory).
-								line = '<a href="%s%s" target="discard">/%s</a>' % (self.path, quote(line), line)
+								line = '<a href="%s%s" target="discard">/%s</a>' % \
+									(self.path, quote(line), line)
 							else:
 								# It's a non-DVD directory
 								line = '<a href="%s%s/">/%s/</a>' % (self.path, quote(line), line)
