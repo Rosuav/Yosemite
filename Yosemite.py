@@ -13,7 +13,7 @@ import json
 from subprocess import Popen
 import collections
 from urllib.parse import quote, unquote
-import http.server as BaseHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import xml.sax.saxutils
 from config import * # Get the user config (see config.py)
 
@@ -94,7 +94,7 @@ print("Using %s and %s"%(invoker,keysender))
 # but note that this is not retained across server restarts.
 usage = collections.Counter()
 
-class VideosHTTP(BaseHTTPServer.BaseHTTPRequestHandler):
+class VideosHTTP(BaseHTTPRequestHandler):
 	def noresp(self):
 			self.send_response(200)
 			self.send_header("Content-type","text/plain")
@@ -274,7 +274,7 @@ b"""
 	server_version="Videos/0.1"
 
 try:
-	server=BaseHTTPServer.HTTPServer(("",port),VideosHTTP)
+	server=HTTPServer(("",port),VideosHTTP)
 	print("Server active");
 	server.serve_forever();
 except KeyboardInterrupt:
