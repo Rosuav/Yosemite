@@ -22,74 +22,74 @@ if usevnc: # Send keys via VNC. Works on any platform, as long as there's a VNC 
 	print("Connecting to VNC")
 	import socket
 	vnc=socket.socket()
-	vnc.connect(("127.0.0.1",5900))
+	vnc.connect(("127.0.0.1", 5900))
 	vnc.send(vnc.recv(12)) # Handshake
 	vnc.recv(16); vnc.send("\1"); vnc.recv(16) # Auth (no auth)
 	vnc.send("\1"); vnc.recv(256) # Shared mode
-	def dokey(key1,key2=None):
-		vnc.send("\4\1\0\0\0\0"+key1) # Modifier down (or key down, if no modifier)
-		if key2!=None:
-			vnc.send("\4\1\0\0\0\0"+key2) # Key down
-			vnc.send("\4\0\0\0\0\0"+key2) # Key up
-		vnc.send("\4\0\0\0\0\0"+key1) # Modifier up
-	shift="\xff\xe1"; ctrl="\xff\xe3"; left="\xff\x51"; right="\xff\x53"; space="\x00\x20"
+	def dokey(key1, key2=None):
+		vnc.send("\4\1\0\0\0\0" + key1) # Modifier down (or key down, if no modifier)
+		if key2 is not None:
+			vnc.send("\4\1\0\0\0\0" + key2) # Key down
+			vnc.send("\4\0\0\0\0\0" + key2) # Key up
+		vnc.send("\4\0\0\0\0\0" + key1) # Modifier up
+	shift, ctrl, left, right, space = "\xff\xe1", "\xff\xe3", "\xff\x51", "\xff\x53", "\x00\x20"
 	print("VNC connection established.")
-	keysender="VNC"
+	keysender = "VNC"
 else: # Try some platform-specific methods.
 	try:
 		# Do it with the win32api module. Works, obviously, only on Windows.
 		import win32api
-		def dokey(key1,key2=None):
-			win32api.keybd_event(key1,0,0,0)
-			if key2!=None:
-				win32api.keybd_event(key2,0,0,0)
-				win32api.keybd_event(key2,0,2,0)
-			win32api.keybd_event(key1,0,2,0)
-		shift=16; ctrl=17; left=37; right=39; space=32
-		keysender="keybd_event"
+		def dokey(key1, key2=None):
+			win32api.keybd_event(key1, 0, 0, 0)
+			if key2 is not None:
+				win32api.keybd_event(key2, 0, 0, 0)
+				win32api.keybd_event(key2, 0, 2, 0)
+			win32api.keybd_event(key1, 0, 2, 0)
+		shift, ctrl, left, right, space = 16, 17, 37, 39, 32
+		keysender = "keybd_event"
 	except ImportError:
 		# No win32api. Try crikey.
 		try:
 			Popen("crikey")
 			# If nothing is raised, we can use crikey.
-			def dokey(key1,key2=""):
+			def dokey(key1, key2=""):
 				Popen(["crikey", key1+key2])
-			shift="\\S"; ctrl="\\C"; left="\\(Left\\)"; right="\\(Right\\)"; space=" "
-			keysender="crikey"
+			shift, ctrl, left, right, space = "\\S", "\\C", "\\(Left\\)", "\\(Right\\)", " "
+			keysender = "crikey"
 		except FileNotFoundError:
 			# No crikey found in system path
-			def dokey(key1,key2=None):
+			def dokey(key1, key2=None):
 				pass # No key sending available
 			print("Unable to send keys.")
-			keysender="no key sender"
+			keysender = "no key sender"
 
-if invokecmd!=None:
+if invokecmd is not None:
 	def invoke(object):
-		os.system(invokecmd%object)
-	invoker="defined command"
+		os.system(invokecmd % object)
+	invoker = "defined command"
 else:
 	try:
 		import win32api
 		def invoke(object):
-			win32api.ShellExecute(0,None,object,None,None,0)
-		invoker="ShellExecute"
+			win32api.ShellExecute(0, None, object, None, None, 0)
+		invoker = "ShellExecute"
 	except ImportError:
 		for invoker in ("xdg-open", "exo-open", "gnome-open", "kde-open", None):
 			try:
-				if invoker: Popen(invoker,stderr=open(os.devnull,"w"),stdout=open(os.devnull,"w"))
+				if invoker: Popen(invoker, stderr=open(os.devnull,"w"), stdout=open(os.devnull,"w"))
 				break # Once one succeeds, use it.
 			except FileNotFoundError:
 				pass
 		if invoker:
 			def invoke(object):
-				Popen([invoker,object])
+				Popen([invoker, object])
 				# Optionally send an 'f' to toggle full-screen
 				# if keysender=="crikey": Popen(["crikey","-s","1","\27f"]); # I've no idea what the \27 is there for. ???
 		else:
 			print("Unable to invoke movies.")
-			invoker="no invoker"
+			invoker = "no invoker"
 
-print("Using %s and %s"%(invoker,keysender))
+print("Using %s and %s" % (invoker, keysender))
 
 # Every file invocation gets counted. This makes for a crude popularity count,
 # but note that this is not retained across server restarts.
