@@ -63,6 +63,7 @@ else: # Try some platform-specific methods.
 			def dokey(key1, key2=None):
 				pass # No key sending available
 			print("Unable to send keys.")
+			shift = ctrl = left = right = space = None
 			keysender = "no key sender"
 
 if invokecmd is not None:
