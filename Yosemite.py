@@ -8,6 +8,7 @@
 # If there is a file called 00index.txt in a directory, it will be displayed in the directory listing.
 # Directories that look like DVDs (those that have a VIDEO_TS subfolder) will be treated as invokable.
 # Requires Python 3.4 or greater (I think - untested on 3.3).
+# Python 3.5 would permit the use of bytes interpolation, which would improve the code somewhat.
 
 import os
 import json
