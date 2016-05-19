@@ -34,7 +34,7 @@ Description=Yosemite Project
 [Service]
 # The user, path, and X display are derived at installation time
 # from the attributes of the yos script. Reinstall to reset them.
-Environment=DISPLAY=$DISPLAY
+Environment=DISPLAY=$DISPLAY LANG=$LANG
 User=`stat -c %%u $0`
 ExecStart=`readlink -e $0`
 ExecReload=`readlink -e $0` reconnect
