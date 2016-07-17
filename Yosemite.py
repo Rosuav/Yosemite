@@ -110,8 +110,8 @@ class VideosHTTP(BaseHTTPRequestHandler):
 		"/fwd1": [shift, right],
 		"/fwd2": [ctrl, right],
 		"/back1": [shift, left],
-		"/pause": [space],
 		"/back2": [ctrl, left],
+		"/pause": [space],
 		"/nextsrt": ['v'],
 		"/nextaud": ['b'],
 	}
