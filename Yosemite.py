@@ -117,7 +117,7 @@ class VideosHTTP(BaseHTTPRequestHandler):
 	}
 	def do_GET(self):
 		if self.path in self.keycmds:
-			dokey(*keycmds[self.path])
+			dokey(*self.keycmds[self.path])
 			self.noresp()
 			return
 		if self.path == "/stop":
