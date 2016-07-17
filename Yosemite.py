@@ -114,6 +114,10 @@ class VideosHTTP(BaseHTTPRequestHandler):
 		"/pause": [space],
 		"/nextsrt": ['v'],
 		"/nextaud": ['b'],
+		"/sync_srt_back": ['g'],
+		"/sync_srt_fwd": ['h'],
+		"/sync_aud_back": ['j'],
+		"/sync_aud_fwd": ['k'],
 	}
 	def do_GET(self):
 		if self.path in self.keycmds:
@@ -192,6 +196,16 @@ function docmd(c)
 </head>
 <body>
 <div style="position:fixed; right:10px; background-color:0f0">
+<div>
+<input type="button" value="&lt;" onclick="docmd('sync_srt_back')">
+Sync subs
+<input type="button" value="&gt;" onclick="docmd('sync_srt_fwd')">
+</div>
+<div>
+<input type="button" value="&lt;" onclick="docmd('sync_aud_back')">
+Sync audio
+<input type="button" value="&gt;" onclick="docmd('sync_aud_fwd')">
+</div>
 <div>
 <input type="button" value="&lt;&lt;" onclick="docmd('back2')">
 <input type="button" value="&lt;" onclick="docmd('back1')">
